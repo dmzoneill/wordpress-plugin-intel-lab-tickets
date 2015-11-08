@@ -1,0 +1,11 @@
+[widget_header]
+
+<aside id="intel-calendar-widget" class="widget">
+  <div class="container">
+    <ul>
+    #ticketentry#
+      <li><a href='https://snnlab.ir.intel.com/index.php?/Default/Tickets/Ticket/View/[ticketid]' target='_blank'>[subject]</a></li>
+    #/ticketentry#
+    </ul>
+  </div>
+</aside> 
