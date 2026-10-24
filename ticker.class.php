@@ -79,19 +79,6 @@ class Ticker
 		return $departments;
 	}
 
-	private function find_tickets( $departments, $status, $type )
-	{
-		$ticketsfound = kyTicket::getAll
-		(
-			$departments,
-			kyTicketStatus::getAll()->filterByTitle( $status )
-		)->filterByTypeId( kyTicketType::getAll()->filterByTitle( $type )->first()->getId() )->getRawArray();
-
-		usort( $ticketsfound, array( "Ticker", "sortBy" ) );
-
-		return $ticketsfound;
-	}
-
 	public function callback_ticketlist( $match )
 	{		
 		$itemlist = "";
@@ -102,13 +89,84 @@ class Ticker
 		$ticketStatus = (strpos(__TICKET_STATUS, "|") > 0) ? explode("|", __TICKET_STATUS) : __TICKET_STATUS;
 		$ticketType = (strpos(__TICKET_TYPE, "|") > 0) ? explode("|", __TICKET_TYPE) : __TICKET_TYPE;
 				
-		$departments = $this->filter_by_depts();
-
-		foreach ( (array) $ticketStatus as $status )
+		if( is_array( $ticketStatus ) )
 		{
-			foreach ( (array) $ticketType as $type )
+			$departments = $this->filter_by_depts();
+
+			foreach ($ticketStatus as $status) 
 			{
-				$tickets = array_merge( $tickets, $this->find_tickets( $departments, $status, $type ) );
+				if( is_array( $ticketType ) )
+				{
+					foreach ($ticketType as $type) 
+					{
+						$ticketsearch = kyTicket::getAll
+						( 
+							$departments, 
+							kyTicketStatus::getAll()->filterByTitle( $status )
+						)->filterByTypeId( kyTicketType::getAll()->filterByTitle( $type )->first()->getId() );
+					
+						if(count($ticketsearch->getRawArray()) > 0)
+						{
+							$ticketsfound = $ticketsearch->getRawArray();
+							usort($ticketsfound, array("Ticker", "sortBy"));
+							$tickets = array_merge($tickets, $ticketsfound);
+						}
+					}
+				}
+				else
+				{
+
+					$ticketsearch = kyTicket::getAll
+					( 
+						$departments, 
+						kyTicketStatus::getAll()->filterByTitle( $status )
+					)->filterByTypeId( kyTicketType::getAll()->filterByTitle( $ticketType )->first()->getId() );
+
+					if(count($ticketsearch->getRawArray()) > 0)
+					{
+						$ticketsfound = $ticketsearch->getRawArray();
+						usort($ticketsfound, array("Ticker", "sortBy"));
+						$tickets = array_merge($tickets, $ticketsfound);
+					}
+				}
+			}
+		}
+		else
+		{
+			$departments = $this->filter_by_depts();
+
+			if( is_array( $ticketType ) )
+			{
+				foreach ($ticketType as $type) 
+				{
+					$ticketsearch = kyTicket::getAll
+					( 
+						$departments,  
+						kyTicketStatus::getAll()->filterByTitle( $ticketStatus )
+					)->filterByTypeId( kyTicketType::getAll()->filterByTitle( $type )->first()->getId() );
+
+					if(count($ticketsearch->getRawArray()) > 0)
+					{
+						$ticketsfound = $ticketsearch->getRawArray();
+						usort($ticketsfound, array("Ticker", "sortBy"));
+						$tickets = array_merge($tickets, $ticketsfound);
+					}
+				}
+			}
+			else
+			{
+				$ticketsearch = kyTicket::getAll
+				( 
+					$departments,  
+					kyTicketStatus::getAll()->filterByTitle( $ticketStatus )
+				)->filterByTypeId( kyTicketType::getAll()->filterByTitle( $ticketType )->first()->getId() );
+
+				if(count($ticketsearch->getRawArray()) > 0)
+				{
+					$ticketsfound = $ticketsearch->getRawArray();
+					usort($ticketsfound, array("Ticker", "sortBy"));
+					$tickets = array_merge($tickets, $ticketsfound);
+				}
 			}
 		}
 
