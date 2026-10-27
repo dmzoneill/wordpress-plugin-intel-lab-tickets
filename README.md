@@ -1,5 +1,9 @@
 # Intel Lab Tickets WordPress Plugin
 
+<p align="center">
+  <img src=".github/logo.png" alt="wordpress-plugin-intel-lab-tickets logo" width="128" />
+</p>
+
 A WordPress plugin that shows Intel lab support tickets in a widget.
 
 ## What it does
